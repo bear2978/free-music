@@ -51,15 +51,7 @@ public class WangYiMusic {
         JSONObject rs = JSONObject.fromObject(result);
         String code = rs.getString("code");
         if("200".equals(code)){
-            // 获取歌单下所有歌曲
-//            JSONArray tracks = rs.getJSONObject("playlist").getJSONArray("tracks");
-//            // 前三首歌曲有详细信息
-//            for (int i = 0; i < tracks.size(); i++) {
-//                JSONObject temp = tracks.getJSONObject(i);
-//                list.add(parseJson(temp));
-//                // System.out.println(parseJson(temp));
-//            }
-            // 根据id获取其余歌曲信息
+            // 获取歌单下所有歌曲,并根据id获取歌曲详细信息
             JSONArray trackIds = rs.getJSONObject("playlist").getJSONArray("trackIds");
             for (int i = 0; i < trackIds.size(); i++) {
                 JSONObject temp = trackIds.getJSONObject(i);
@@ -93,6 +85,12 @@ public class WangYiMusic {
         return musicInfo;
     }
 
+    /**
+     * 获取歌曲歌词
+     * @param id
+     * @return
+     * @throws IOException
+     */
     public static String getLyricById(String id) throws IOException {
         String url = "http://music.163.com/api/song/lyric";
         String result = Jsoup.connect(url)
@@ -105,10 +103,8 @@ public class WangYiMusic {
                 .userAgent(UserAgent.randomAgent())
                 .ignoreContentType(true).timeout(10000).execute().body();
         String lyric = JSONObject.fromObject(result).getJSONObject("lrc").toString();
-        System.out.println(lyric);
         return lyric;
     }
-
 
     /**
      * 将响应的json数据解析成对象返回
@@ -116,13 +112,13 @@ public class WangYiMusic {
      */
     private static MusicInfo parseJson(JSONObject jo){
         // 获取相关歌曲信息
-        Long id = jo.getLong("id");
+        String id = jo.getString("id");
         String songName = jo.getString("name");
         String singer = jo.getJSONArray("ar").getJSONObject(0).getString("name");
         String album = jo.getJSONObject("al").getString("name");
-        // 拼接歌曲外链
         String picId = jo.getJSONObject("al").getString("pic");
         String picUrl = jo.getJSONObject("al").getString("picUrl");
+        // 拼接歌曲外链
         String songUrl = "http://music.163.com/song/media/outer/url?id=" + id;
         String lyricId = jo.getString("id");
         MusicInfo musicInfo = new MusicInfo();

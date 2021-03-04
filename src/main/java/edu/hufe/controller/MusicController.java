@@ -1,5 +1,7 @@
 package edu.hufe.controller;
 
+import edu.hufe.api.KuGouMusic;
+import edu.hufe.api.QQMusic;
 import edu.hufe.api.WangYiMusic;
 import edu.hufe.entity.MusicInfo;
 import edu.hufe.entity.PlayList;
@@ -24,7 +26,7 @@ public class MusicController {
      */
     @RequestMapping("search")
     @ResponseBody
-    public List<MusicInfo> searchMusic(int count, String source, int page, String keyword){
+    public List<MusicInfo> searchMusic(String count, String source, String page, String keyword){
         System.out.println(count + "-->" + source + "-->" + page + "-->" +  keyword);
         // 根据数据源进行分流处理
         List<MusicInfo> list = null;
@@ -33,7 +35,15 @@ public class MusicController {
                 case "netease":
                     list = WangYiMusic.searchMusic(keyword);
                     break;
-                case "":
+                case "tencent":
+                    list = QQMusic.searchMusic(page,count,keyword);
+                    break;
+                case "kuwo":
+                    list = QQMusic.searchMusic(page,count,keyword);
+                    break;
+                case "kugou":
+                    list = KuGouMusic.searchMusic(page,count,keyword);
+                    break;
 
                 default:
 
@@ -47,7 +57,7 @@ public class MusicController {
     @RequestMapping("getSong")
     @ResponseBody
     public MusicInfo searchMusic(String id, String source){
-        System.out.println(id + "-->" + source);
+        System.out.println("加载音乐-->" + id + "-->" + source);
         // 根据数据源进行分流处理
         MusicInfo musicInfo = null;
         try {
@@ -55,8 +65,11 @@ public class MusicController {
                 case "netease":
                     musicInfo = WangYiMusic.getMusicInfoById(id);
                     break;
-                case "":
-
+                case "tencent":
+                    musicInfo = QQMusic.getMusicInfoById(id);
+                case "kugou":
+                    musicInfo = KuGouMusic.getMusicInfoById(id);
+                    break;
                 default:
 
             }
@@ -94,6 +107,7 @@ public class MusicController {
     @RequestMapping("detailPlaylist")
     @ResponseBody
     public List<MusicInfo> getPlayListById(String id){
+        System.out.println("加载播放列表-->" + id);
         List<MusicInfo> list = null;
         try {
             list = WangYiMusic.getPlayListById(id);
@@ -106,15 +120,18 @@ public class MusicController {
     @RequestMapping("loadLyric")
     @ResponseBody
     public String getLyric(String id, String source){
-        System.out.println(id + "--->" + source);
+        System.out.println("加载歌词--->"+ id + "--->" + source);
         String lyric = null;
         try {
             switch (source){
                 case "netease":
                     lyric = WangYiMusic.getLyricById(id);
                     break;
-                case "":
-
+                case "tencent":
+                    lyric = QQMusic.getLyricById(id);
+                case "kugou":
+                    lyric = KuGouMusic.getLyricById(id);
+                    break;
                 default:
 
             }

@@ -228,7 +228,6 @@ function listClick(no) {
     }
     
     playList(tmpid);
-    
     return true;
 }
 
@@ -251,7 +250,7 @@ function playList(id) {
     // 记录正在播放的歌曲在正在播放列表中的 id
     rem.playid = id;
     
-    // 如果链接为空，则 ajax 获取数据后再播放
+    // 如果链接为空，则ajax获取数据后再播放
     if(musicList[1].item[id].musicUrl === null || musicList[1].item[id].musicUrl === "") {
         ajaxUrl(musicList[1].item[id], play);
     } else {
@@ -277,7 +276,7 @@ function initAudio() {
 // 参数：要播放的音乐数组
 function play(music) {
     // 调试信息输出
-    if(Player.debug) {
+    if(!Player.debug) {
         console.log('开始播放 - ' + music.name);
         
         console.info('id: "' + music.id + '",\n' + 

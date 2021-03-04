@@ -150,7 +150,7 @@ $(function(){
             layer.msg('列表读取中...', {icon: 16,shade: 0.01,time: 500}); // 0代表加载的风格，支持0-2
             // 点击歌单ajax加载数据
             ajaxPlayList(musicList[num].id, num, loadList);
-            // return true;
+            return true;
         }
         loadList(num);
     });
@@ -281,7 +281,7 @@ function musicInfo(list, index) {
     '<br><span class="info-title">歌手：</span>' + music.artist + 
     '<br><span class="info-title">专辑：</span>' + music.album;
     
-    if(list === rem.playlist && index === rem.playid) {   // 当前正在播放这首歌，那么还可以顺便获取一下时长。。
+    if(list === rem.playlist && index === rem.playid) {   // 当前正在播放这首歌,那么还可以顺便获取一下时长。。
         tempStr += '<br><span class="info-title">时长：</span>' + formatTime(rem.audio[0].duration);
     }
     
@@ -297,7 +297,7 @@ function musicInfo(list, index) {
         content: tempStr
     });
     
-    if(Player.debug) {
+    if(!Player.debug) {
         console.info('id: "' + music.id + '",\n' +
             'name: "' + music.name + '",\n' +
             'artist: "' + music.artist + '",\n' +
@@ -312,6 +312,7 @@ function musicInfo(list, index) {
 
 // 展现搜索弹窗
 function searchBox() {
+    // 发送请求获取数据源信息
     var tmpHtml = '<form onSubmit="return searchSubmit()"><div id="search-area">' + 
     '    <div class="search-group">' + 
     '        <input type="text" name="wd" id="search-wd" placeholder="搜索歌手、歌名、专辑" autofocus required>' + 
@@ -319,8 +320,8 @@ function searchBox() {
     '    </div>' + 
     '    <div class="radio-group" id="music-source">' + 
     '       <label><input type="radio" name="source" value="netease" checked> 网易云</label>' +
-    '       <label><input type="radio" name="source" value="tencent"> QQ</label>' + 
-    '       <label><input type="radio" name="source" value="xiami"> 虾米</label>' + 
+    '       <label><input type="radio" name="source" value="tencent"> QQ</label>' +
+    '       <label><input type="radio" name="source" value="kuwo"> 酷我</label>' +
     '       <label><input type="radio" name="source" value="kugou"> 酷狗</label>' + 
     '       <label><input type="radio" name="source" value="baidu"> 百度</label>' + 
     '   </div>' + 
@@ -328,12 +329,11 @@ function searchBox() {
     layer.open({
         type: 1,
         shade: false,
-        title: false, // 不显示标题
+        title: false,  // 不显示标题
         shade: 0.5,    // 遮罩颜色深度
         shadeClose: true,
         content: tmpHtml,
-        cancel: function(){
-        }
+        cancel: function(){}
     });
     
     // 恢复上一次的输入
@@ -350,13 +350,12 @@ function searchSubmit() {
         return false;
     }
     rem.source = $("#music-source input[name='source']:checked").val();
-    
-    layer.closeAll('page');     // 关闭搜索框
-    
     rem.loadPage = 1;   // 已加载页数复位
     rem.wd = wd;    // 搜索词
+    
+    layer.closeAll('page');     // 关闭搜索框
     ajaxSearch();   // 加载搜索结果
-    // return false;
+    return false;
 }
 
 // 下载正在播放的这首歌
@@ -372,11 +371,11 @@ function thisShare(obj) {
 // 下载歌曲
 // 参数：包含歌曲信息的数组
 function download(music) {
-    if(music.url == 'err' || music.url == "" || music.url == null) {
+    if(music.musicUrl == 'err' || music.musicUrl == "" || music.musicUrl == null) {
         layer.msg('这首歌不支持下载');
         return;
     }
-    openDownloadDialog(music.url, music.name + ' - ' + music.artist);
+    openDownloadDialog(music.musicUrl, music.name + ' - ' + music.artist);
 }
 
 /**
@@ -405,13 +404,13 @@ function openDownloadDialog(url, saveName) {
 // 获取外链的ajax回调函数
 // 参数：包含音乐信息的数组
 function ajaxShare(music) {
-    if(music.url == 'err' || music.url == "" || music.url == null) {
+    if(music.musicUrl == 'err' || music.musicUrl == "" || music.musicUrl == null) {
         layer.msg('这首歌不支持外链获取');
         return;
     }
     
     var tmpHtml = '<p>' + music.artist + ' - ' + music.name + ' 的外链地址为：</p>' + 
-    '<input class="share-url" onmouseover="this.focus();this.select()" value="' + music.url + '">' + 
+    '<input class="share-url" onmouseover="this.focus();this.select()" value="' + music.musicUrl + '">' +
     '<p class="share-tips">* 获取到的音乐外链有效期较短，请按需使用。</p>';
     
     layer.open({
@@ -752,6 +751,7 @@ function initList() {
         
         if(tmp_ulist) musicList.push.apply(musicList, tmp_ulist);   // 追加到系统歌单的后面
     }
+    //  <!-- 这里逻辑需要优化 -->
     // ajax加载系统内置歌单列表
     $.ajax({
         type: Player.method,
@@ -789,6 +789,7 @@ function initList() {
                 // 在前端显示出来
                 addSheet(i, musicList[i].name, musicList[i].cover);
             }
+
             // 超出范围, 显示正在播放列表
             if(Player.defaultlist >= musicList.length){
                 Player.defaultlist = 1;

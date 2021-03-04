@@ -99,17 +99,6 @@ var musicList = [
                 lyricId: "001JD1SR29d1hS"
             },
             {
-                id: "81175",
-                name: "让我欢喜让我忧",
-                artist: "周华健",
-                album: "让我欢喜让我忧",
-                source: "xiami",    // 虾米
-                picId: "81175",
-                picUrl: "https://pic.xiami.net/images/album/img58/1258/66271400572139.jpg@300h_300w_100q_1c.jpg",
-                musicUrl: "",     // 虾米的外链有效期较短，插入时 url [必须]设置空值，播放时再临时抓取
-                lyricId: "81175"
-            },
-            {
                 id: "2a24dea6c74884195fe5b9732fd95ca8",
                 name: "小幸运",
                 artist: "金玟岐",

@@ -68,7 +68,7 @@ function ajaxSearch() {
             }
             
             rem.dislist = 0;    // 当前显示的是搜索列表
-            rem.loadPage ++;    // 已加载的列数+1
+            rem.loadPage ++;    // 已加载的页数+1
             
             dataBox("list");    // 在主界面显示出播放列表
             refreshList();  // 刷新列表，添加正在播放样式
@@ -91,11 +91,12 @@ function ajaxSearch() {
 // 完善获取音乐信息
 // 音乐所在列表ID、音乐对应ID、回调函数
 function ajaxUrl(music, callback) {
-    // 已经有数据，直接回调
+    // 已经有数据,直接回调
     if(music.musicUrl !== null && music.musicUrl !== "err" && music.musicUrl !== "") {
         callback(music);
         return true;
     }
+    console.log(music.id + "-->" + music.musicUrl);
     // id为空，赋值链接错误。直接回调
     if(music.id === null) {
         music.musicUrl = "err";
@@ -110,6 +111,7 @@ function ajaxUrl(music, callback) {
         data: "id=" + music.id + "&source=" + music.source,
         dataType : "json",
         success: function(jsonData){
+            console.log(jsonData);
             // 调试信息输出
             if(Player.debug) {
                 console.debug("歌曲链接：" + jsonData.musicUrl);
@@ -215,7 +217,6 @@ function ajaxPlayList(lid, id, callback) {
         success:function(data){
             for (let i = 0; i < data.length; i++){
                 musicList[id].item.push(data[i]);
-                // console.log(data[i]);
             }
             // 首页显示默认列表
             if(id === Player.defaultlist){

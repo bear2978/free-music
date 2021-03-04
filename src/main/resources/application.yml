@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+spring:
+  resources:
+    static-locations: classpath:templates/
+
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+##    static-path-pattern: /*
