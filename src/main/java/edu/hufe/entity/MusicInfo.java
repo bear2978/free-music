@@ -21,6 +21,7 @@ public class MusicInfo {
     // 音乐url
     private String musicUrl;
     // 歌词
+
     private String lyricId;
 
     public String getId() {
