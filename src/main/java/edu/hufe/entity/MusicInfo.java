@@ -1,9 +1,11 @@
 package edu.hufe.entity;
 
+import java.io.Serializable;
+
 /**
  * 歌曲实体
  */
-public class MusicInfo {
+public class MusicInfo implements Serializable {
     // id
     private String id;
     // 歌曲名称
@@ -21,7 +23,6 @@ public class MusicInfo {
     // 音乐url
     private String musicUrl;
     // 歌词
-
     private String lyricId;
 
     public String getId() {

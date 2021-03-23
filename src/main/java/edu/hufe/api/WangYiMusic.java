@@ -1,6 +1,8 @@
 package edu.hufe.api;
 
 import edu.hufe.entity.MusicInfo;
+import edu.hufe.utils.DataUtil;
+import edu.hufe.utils.RequestUtil;
 import edu.hufe.utils.UserAgent;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -9,7 +11,9 @@ import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WangYiMusic {
 
@@ -17,7 +21,7 @@ public class WangYiMusic {
      * 根据关键字获取歌曲信息
      * @param keyword
      */
-    public static List<MusicInfo> searchMusic(String keyword) throws IOException {
+    public static List<MusicInfo> searchMusic(String count, String page, String keyword) throws IOException {
         List<MusicInfo> list = new ArrayList<>();
         String searchUrl = "http://music.163.com/api/cloudsearch/pc?s=" + keyword + "&type=1";
         String result = connectToUrl(searchUrl);
@@ -49,6 +53,7 @@ public class WangYiMusic {
                 .userAgent(UserAgent.randomAgent())
                 .ignoreContentType(true).timeout(10000).execute().body();
         JSONObject rs = JSONObject.fromObject(result);
+        // System.out.println(rs);
         String code = rs.getString("code");
         if("200".equals(code)){
             // 获取歌单下所有歌曲,并根据id获取歌曲详细信息
@@ -81,6 +86,7 @@ public class WangYiMusic {
         if("200".equals(code)){
             JSONObject song = rs.getJSONArray("songs").getJSONObject(0);
             musicInfo = parseJson(song);
+            // System.out.println(musicInfo);
         }
         return musicInfo;
     }
@@ -93,16 +99,21 @@ public class WangYiMusic {
      */
     public static String getLyricById(String id) throws IOException {
         String url = "http://music.163.com/api/song/lyric";
-        String result = Jsoup.connect(url)
-                .data("id",id)
-                .data("os","linux")
-                .data("lv","-1")
-                .data("kv","-1")
-                .data("tv","-1")
-                .method(Connection.Method.POST)
-                .userAgent(UserAgent.randomAgent())
-                .ignoreContentType(true).timeout(10000).execute().body();
-        String lyric = JSONObject.fromObject(result).getJSONObject("lrc").toString();
+        // 创建请求数据map
+        Map<String,String> data = new HashMap<>();
+        data.put("id", id);
+        data.put("os", "linux");
+        data.put("lv", "-1");
+        data.put("kv", "-1");
+        data.put("tv", "-1");
+        String result = RequestUtil.connectToUrl(url,null, data, Connection.Method.POST);
+        // System.out.println(result);
+        JSONObject rs = JSONObject.fromObject(result);
+        String code = rs.getString("code");
+        String lyric = "";
+        if("200".equals(code)){
+            lyric = rs.getString("lrc");
+        }
         return lyric;
     }
 
@@ -113,25 +124,14 @@ public class WangYiMusic {
     private static MusicInfo parseJson(JSONObject jo){
         // 获取相关歌曲信息
         String id = jo.getString("id");
-        String songName = jo.getString("name");
-        String singer = jo.getJSONArray("ar").getJSONObject(0).getString("name");
+        String name = jo.getString("name");
+        String artist = jo.getJSONArray("ar").getJSONObject(0).getString("name");
         String album = jo.getJSONObject("al").getString("name");
         String picId = jo.getJSONObject("al").getString("pic");
         String picUrl = jo.getJSONObject("al").getString("picUrl");
         // 拼接歌曲外链
         String songUrl = "http://music.163.com/song/media/outer/url?id=" + id;
-        String lyricId = jo.getString("id");
-        MusicInfo musicInfo = new MusicInfo();
-        musicInfo.setId(id);
-        musicInfo.setName(songName);
-        musicInfo.setArtist(singer);
-        musicInfo.setAlbum(album);
-        musicInfo.setSource("netease");
-        musicInfo.setPicId(picId);
-        musicInfo.setPicUrl(picUrl);
-        musicInfo.setMusicUrl(songUrl);
-        musicInfo.setLyricId(lyricId);
-        return musicInfo;
+        return DataUtil.fillData(id,name,artist,album,"1",picId,picUrl,songUrl,id);
     }
 
     /**
@@ -152,7 +152,8 @@ public class WangYiMusic {
         try {
             // getPlayListById("3779629");
             // getMusicInfoById("1815105886");
-            getLyricById("1815105886");
+            // getLyricById("1815105886");
+            getLyricById("1830718509");
             // searchMusic("饭思思");
         } catch (IOException e) {
             e.printStackTrace();

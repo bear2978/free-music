@@ -11,4 +11,9 @@ public class SystemController {
         return "index";
     }
 
+    @RequestMapping(value = {"/admin","/manage"})
+    public String adminHome(){
+        return "admin/login";
+    }
+
 }

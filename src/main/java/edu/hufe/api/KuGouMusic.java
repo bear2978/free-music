@@ -37,7 +37,7 @@ public class KuGouMusic {
      * @return
      * @throws IOException
      */
-    public static List<MusicInfo> searchMusic(String page, String num, String keyword) throws IOException {
+    public static List<MusicInfo> searchMusic(String num, String page, String keyword) throws IOException {
         List<MusicInfo> list = new ArrayList<>();
         // 拼接请求数据url
         String url = "http://mobilecdn.kugou.com/api/v3/search/song";
@@ -54,8 +54,8 @@ public class KuGouMusic {
         if("1".equals(status)){
             JSONArray songs = rs.getJSONObject("data").getJSONArray("info");
             // 遍历所有歌曲
-            // for (int i = 0; i < songs.size(); i++) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < songs.size(); i++) {
+            // for (int i = 0; i < 5; i++) {
                 JSONObject item = songs.getJSONObject(i);
                 String hash = item.getString("hash");
                 String name = item.getString("songname_original");
@@ -64,9 +64,8 @@ public class KuGouMusic {
                 String album = item.getString("album_name");
                 // 使用酷狗音乐的hash值及专辑id拼接id
                 String id = hash + "-" + albumID;
-                getMusicInfoById(id);
                 // System.out.println(DataUtil.fillData(id,name,artist,album,"kugou",id,"","",id));
-                list.add(DataUtil.fillData(id,name,artist,album,"kugou",id,"","",id));
+                list.add(DataUtil.fillData(id,name,artist,album,"4",id,"","",id));
             }
         }
         return list;
@@ -84,16 +83,16 @@ public class KuGouMusic {
         // 获取响应的结果数据
         JSONObject rs = getMusicInfoJson(id);
         // System.out.println(rs);
-        // String picUrl = rs.getString("img");
+        String picUrl = rs.getString("img");
         String songUrl = "";
         try {
             songUrl = rs.getString("play_url");
-            System.out.println(songUrl);
+            // System.out.println(songUrl);
             if(songUrl == null || songUrl.equals("")){
                 songUrl = rs.getString("play_backup_url");
             }
         }catch (Exception e){}
-        // musicInfo.setPicUrl(picUrl);
+        musicInfo.setPicUrl(picUrl);
         musicInfo.setMusicUrl(songUrl);
         // System.out.println(musicInfo);
         return musicInfo;

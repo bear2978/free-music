@@ -1,8 +1,6 @@
 @charset "utf-8";
 /**************************************************
- * MKOnlinePlayer v2.41
  * 播放器样式表文件
- * 编写：mengkun(https://mkblog.cn)
  * 时间：2018-3-13
  *************************************************/
 blockquote, body, button, dd, dl, dt, fieldset, form, h1, h2, h3, h4, h5, h6, hr, html, input, lengend, li, ol, p, pre, td, textarea, th, ul {
@@ -15,7 +13,7 @@ body, button, input, select, textarea, th {
     font-size: 14px;
     line-height: 1.5;
     font-family: poppin, 'PingFang SC', Tahoma, Arial, \5FAE\8F6F\96C5\9ED1, sans-serif;
-    font-family: Tahoma, Arial, \5FAE\8F6F\96C5\9ED1, sans-serif/9
+    font-family: Tahoma, Arial, \5FAE\8F6F\96C5\9ED1, sans-serif
 }
 h1, h2, h3, h4, h5, h6 {
     font-size: 100%
@@ -382,21 +380,39 @@ body {
     margin-left: 10px;
     cursor: pointer;
 }
+/* 正在播放 */
 .list-playing .icon-play{
     display: none;
 }
+/* 播放 */
 .icon-play {
     background-position: -80px 0;
 }
 .icon-play:hover {
     background-position: -120px 0;
 }
+/* 添加 */
+.icon-add {
+    background-position: -80px -80px;
+}
+.icon-add:hover {
+    background-position: -120px -80px;
+}
+/* 删除 */
+.icon-delete {
+    background-position: -80px -160px;
+}
+.icon-delete:hover {
+    background-position: -120px -160px;
+}
+/* 下载 */
 .icon-download {
     background-position: -80px -120px;
 }
 .icon-download:hover {
     background-position: -120px -120px;
 }
+/* 分享 */
 .icon-share {
     background-position: -80px -40px;
 }
@@ -417,6 +433,7 @@ body {
     color: #333;
     height: 35px;
 }
+
 .share-tips {
     font-size: 12px;
     color: #a9a9a9;

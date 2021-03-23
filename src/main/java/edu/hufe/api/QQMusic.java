@@ -20,13 +20,13 @@ public class QQMusic {
 
     /**
      * 根据关键字获取歌曲信息
-     * @param page 页码
      * @param num 查询记录条数
+     * @param page 页码
      * @param keyword 查询关键字
      * @return
      * @throws IOException
      */
-    public static List<MusicInfo> searchMusic(String page, String num, String keyword) throws IOException {
+    public static List<MusicInfo> searchMusic(String num, String page, String keyword) throws IOException {
         List<MusicInfo> list = new ArrayList<>();
         // 拼接请求数据URL
         String url = "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?p="+ page +"&n=" + num + "&w=" + keyword;
@@ -48,13 +48,14 @@ public class QQMusic {
                 String name = item.getString("songname");
                 String artist = item.getJSONArray("singer").getJSONObject(0).getString("name");
                 String album = item.getString("albumname");
+                // getMusicInfoById(id);
                 // 获取专辑id,然后拼接专辑图片
                 // https://y.gtimg.cn/music/photo_new/T002R300x300M000000HJKHt4gHLtA.jpg?max_age=2592000
                 String albumId = item.getString("albummid");
                 String picUrl = "https://y.gtimg.cn/music/photo_new/T002R300x300M000"+ albumId +".jpg?max_age=2592000";
                 // System.out.println(picUrl);
                 // 暂时不获取音乐的url
-                list.add(DataUtil.fillData(id,name,artist,album,"tencent",id,picUrl,"",id));
+                list.add(DataUtil.fillData(id,name,artist,album,"2",id,picUrl,"",id));
             }
         }
         return list;
@@ -73,7 +74,7 @@ public class QQMusic {
         // System.out.println(result);
         MusicInfo musicInfo = new MusicInfo();
         // 拼接歌曲外链
-        String url = "https://u.y.qq.com/cgi-bin/musicu.fcg?data={\"req\":{\"module\":\"CDN.SrfCdnDispatchServer\",\"method\":\"GetCdnDispatch\",\"param\":{\"guid\":\"703417739\",\"calltype\":0,\"userip\":\"\"}},\"req_0\":{\"module\":\"vkey.GetVkeyServer\",\"method\":\"CgiGetVkey\",\"param\":{\"guid\":\"703417739\",\"songmid\":[\""+ mid+ "\"],\"songtype\":[0],\"uin\":\"\",\"loginflag\":1,\"platform\":\"20\"}},\"comm\":{\"uin\":\"\",\"format\":\"json\",\"ct\":24,\"cv\":0}}";
+        String url = "https://u.y.qq.com/cgi-bin/musicu.fcg?data={\"req\":{\"module\":\"CDN.SrfCdnDispatchServer\",\"method\":\"GetCdnDispatch\",\"param\":{\"guid\":\"703417739\",\"calltype\":0,\"userip\":\"\"}},\"req_0\":{\"module\":\"vkey.GetVkeyServer\",\"method\":\"CgiGetVkey\",\"param\":{\"guid\":\"703417739\",\"songmid\":[\""+ mid+ "\"],\"songtype\":[0],\"uin\":\"\",\"loginflag\":1,\"platform\":\"20\"}},\"comm\":{\"uin\":\"1241550398\",\"format\":\"json\",\"ct\":24,\"cv\":0}}";
         JSONObject rs = JSONObject.fromObject(connectToUrl(url));
         // System.out.println(rs);
         String musicUrl = rs.getJSONObject("req_0").getJSONObject("data").getJSONArray("midurlinfo").getJSONObject(0).getString("purl");
@@ -85,8 +86,8 @@ public class QQMusic {
             // 过滤掉拼接失败的URL
             songUrl = "http://dl.stream.qqmusic.qq.com/" + musicUrl;
         }
+        // System.out.println(songUrl);
         musicInfo.setMusicUrl(songUrl);
-        System.out.println(musicInfo);
         return musicInfo;
     }
 
@@ -135,8 +136,8 @@ public class QQMusic {
 
     public static void main(String[] args) {
         try {
-            // searchMusic("1","30","清空");
-            getMusicInfoById("004LZwE13k5hzj");
+            searchMusic("1","30","爱爱爱");
+            // getMusicInfoById("004LZwE13k5hzj");
             // getMusicInfoById("004LMEOv19smN2");
             // getLyricById("004LMEOv19smN2");
         } catch (IOException e) {

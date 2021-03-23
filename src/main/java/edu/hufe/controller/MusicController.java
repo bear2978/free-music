@@ -1,82 +1,61 @@
 package edu.hufe.controller;
 
-import edu.hufe.api.KuGouMusic;
-import edu.hufe.api.QQMusic;
-import edu.hufe.api.WangYiMusic;
+import edu.hufe.entity.DataSource;
 import edu.hufe.entity.MusicInfo;
 import edu.hufe.entity.PlayList;
+import edu.hufe.service.DataSourceService;
+import edu.hufe.service.PlayListService;
+import edu.hufe.service.PlayerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class MusicController {
 
+    @Autowired
+    private DataSourceService dataSourceService;
+
+    @Autowired
+    private PlayListService playListService;
+
+    @Autowired
+    private PlayerService playerService;
+
+    /**
+     * 获取系统所有数据源
+     * @return
+     */
+    @RequestMapping("getDataSource")
+    @ResponseBody
+    public List<DataSource> getDataSource(){
+        return dataSourceService.findDataSourceList();
+    }
+
     /**
      * 歌曲搜索接口
-     * @param count
      * @param source
+     * @param count
      * @param page
      * @param keyword
      * @return
      */
     @RequestMapping("search")
     @ResponseBody
-    public List<MusicInfo> searchMusic(String count, String source, String page, String keyword){
-        System.out.println(count + "-->" + source + "-->" + page + "-->" +  keyword);
-        // 根据数据源进行分流处理
-        List<MusicInfo> list = null;
-        try {
-            switch (source){
-                case "netease":
-                    list = WangYiMusic.searchMusic(keyword);
-                    break;
-                case "tencent":
-                    list = QQMusic.searchMusic(page,count,keyword);
-                    break;
-                case "kuwo":
-                    list = QQMusic.searchMusic(page,count,keyword);
-                    break;
-                case "kugou":
-                    list = KuGouMusic.searchMusic(page,count,keyword);
-                    break;
-
-                default:
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return list;
+    public List<MusicInfo> searchMusic(String source, String count, String page, String keyword){
+        System.out.println("搜素音乐-->" + source + "-->"+ count + "---->" + page + "---->" + keyword);
+        return playerService.searchMusic(source, count, page, keyword);
     }
 
-    @RequestMapping("getSong")
-    @ResponseBody
-    public MusicInfo searchMusic(String id, String source){
-        System.out.println("加载音乐-->" + id + "-->" + source);
-        // 根据数据源进行分流处理
-        MusicInfo musicInfo = null;
-        try {
-            switch (source){
-                case "netease":
-                    musicInfo = WangYiMusic.getMusicInfoById(id);
-                    break;
-                case "tencent":
-                    musicInfo = QQMusic.getMusicInfoById(id);
-                case "kugou":
-                    musicInfo = KuGouMusic.getMusicInfoById(id);
-                    break;
-                default:
 
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return musicInfo;
+    @RequestMapping("getMusicInfo")
+    @ResponseBody
+    public MusicInfo getMusicInfo(String source, String id){
+        System.out.println("加载音乐-->" + source + "-->"+ id);
+        return playerService.getMusicInfoById(source, id);
     }
 
     /**
@@ -85,20 +64,7 @@ public class MusicController {
     @RequestMapping("playlist")
     @ResponseBody
     public List<PlayList> getPlayList(){
-        List<PlayList> playlist = new ArrayList<>();
-        PlayList one = new PlayList();
-        one.setId((long) 3778678);
-        one.setName("云音乐热歌榜");
-        // 播放列表封面图像
-        one.setCover("http://p4.music.126.net/GhhuF6Ep5Tq9IEvLsyCN7w==/18708190348409091.jpg?param=200y200");
-        PlayList two = new PlayList();
-        two.setId((long) 3779629);
-        two.setName("云音乐新歌榜");
-        // 播放列表封面图像
-        two.setCover("http://p4.music.126.net/2klOtThpDQ0CMhOy5AOzSg==/18878614648932971.jpg?param=200y200");
-        playlist.add(one);
-        playlist.add(two);
-        return playlist;
+        return playListService.queryAllPlayList();
     }
 
     /**
@@ -106,38 +72,15 @@ public class MusicController {
      */
     @RequestMapping("detailPlaylist")
     @ResponseBody
-    public List<MusicInfo> getPlayListById(String id){
-        System.out.println("加载播放列表-->" + id);
-        List<MusicInfo> list = null;
-        try {
-            list = WangYiMusic.getPlayListById(id);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return list;
+    public List<MusicInfo> getPlayListById(String source, String id){
+        System.out.println("加载播放列表-->" + id + "--->" + source);
+        return playListService.queryDetailList(source, id);
     }
 
     @RequestMapping("loadLyric")
     @ResponseBody
-    public String getLyric(String id, String source){
-        System.out.println("加载歌词--->"+ id + "--->" + source);
-        String lyric = null;
-        try {
-            switch (source){
-                case "netease":
-                    lyric = WangYiMusic.getLyricById(id);
-                    break;
-                case "tencent":
-                    lyric = QQMusic.getLyricById(id);
-                case "kugou":
-                    lyric = KuGouMusic.getLyricById(id);
-                    break;
-                default:
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return lyric;
+    public String getLyric(String source, String id){
+        System.out.println("loadLyric--->"+ id + "--->" + source);
+        return playerService.getLyricById(source, id);
     }
 }
