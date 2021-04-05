@@ -15,7 +15,7 @@ public interface DataSourceMapper {
     DataSource findDataSourceById(String id);
 
     // 修改数据源信息
-    boolean updataDataSource(DataSource dataSource);
+    boolean updateDataSource(DataSource dataSource);
 
     // 删除数据源信息
     boolean deleteDataSourceById(String id);

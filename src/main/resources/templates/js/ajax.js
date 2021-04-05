@@ -135,7 +135,7 @@ function ajaxPlayListById(lid, sourceId, id, callback) {
         return false;
     }
 
-    // 已经在加载了，跳过
+    // 已经在加载了,跳过
     if(musicList[id].isloading === true) {
         return true;
     }
@@ -280,7 +280,7 @@ function ajaxUrl(music, callback) {
             }
             
             // 解决网易云音乐部分歌曲无法播放问题
-            if(music.source === "netease") {
+            if(music.source === "1") {
                 if(jsonData.musicUrl === "") {
                     jsonData.musicUrl = "https://music.163.com/song/media/outer/url?id=" + music.id + ".mp3";
                 } else {
@@ -295,10 +295,10 @@ function ajaxUrl(music, callback) {
                 music.musicUrl = "err";
             } else {
                 // 酷狗音乐加载音乐的时候,同时加载专辑图片
-                if(music.source === "kugou"){
+                if(jsonData.picUrl !== undefined && jsonData.picUrl !== null && jsonData.picUrl.indexOf("kugou") !== -1){
                     music.picUrl = jsonData.picUrl;
                 }
-                music.musicUrl = jsonData.musicUrl;    // 记录结果
+                music.musicUrl = jsonData.musicUrl; // 记录结果
             }
             updateMusicInfo(music); // 更新音乐信息
             callback(music);    // 回调函数
@@ -307,7 +307,7 @@ function ajaxUrl(music, callback) {
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             layer.msg('歌曲链接获取失败 - ' + XMLHttpRequest.status);
             console.error(XMLHttpRequest + textStatus + errorThrown);
-        }   // error 
+        }  // error
     }); //ajax
 }
 

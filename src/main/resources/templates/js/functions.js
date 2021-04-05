@@ -154,13 +154,17 @@ $(function(){
     // 点击专辑显示专辑歌曲
     $("#sheet").on("click",".sheet-cover,.sheet-name", function() {
         var num = parseInt($(this).parent().data("no"));
-        // 是系统内置歌单,但是还没有加载数据
-        if(num > 3) {
-            layer.msg('列表读取中...', {icon: 16,shade: 0.01,time: 500}); // 0代表加载的风格，支持0-2
-            // 点击歌单ajax加载数据
-            ajaxPlayListById(musicList[num].id, musicList[num].sourceId, num, loadList);
-            return true;
+        // 是系统内置歌单
+        if(musicList[num].id !== undefined) {
+            // 初始化加载过了就直接加载
+            if(musicList[num].isloading === false){
+                loadList(num);
+            } else { // 还没有数据, 点击歌单ajax加载数据
+                layer.msg('列表读取中...', {icon: 16,shade: 0.01,time: 500});
+                ajaxPlayListById(musicList[num].id, musicList[num].sourceId, num, loadList);
+            }
         }else {
+            // 正在播放列表和播放历史直接加载
             loadList(num);
         }
     });
@@ -403,7 +407,7 @@ function addToPlaying(music){
 // 将歌曲从正在播放列表和播放历史删除
 function deleteFromList(music){
     // 遍历正在播放列表
-    for(var i = 0; i < musicList[rem.dislist].item.length; i++) {
+    for(let i = 0; i < musicList[rem.dislist].item.length; i++) {
         // 与正在播放的歌曲 id 相同
         if((musicList[rem.dislist].item[i].id !== undefined) &&
             (musicList[rem.dislist].item[i].id == music.id) &&
@@ -411,7 +415,13 @@ function deleteFromList(music){
             musicList[rem.dislist].item.splice(i, 1); // 删除对应的歌曲
         }
     }
+
     layer.msg('删除成功', {icon: 6, time: 500});
+    // 删除的是正在播放的歌曲,则播放下一首歌曲
+    if(rem.playid == music.id){
+        nextMusic();
+    }
+
     rem.mainList.html('');   // 清空列表中原有的元素
     addListHead();      // 向列表中加入列表头
 
@@ -419,8 +429,8 @@ function deleteFromList(music){
         addListBar("nodata");   // 列表中没有数据
     } else {
         // 逐项添加数据
-        for (var i = 0; i < musicList[rem.dislist].item.length; i++) {
-            var tmpMusic = musicList[rem.dislist].item[i];
+        for (let i = 0; i < musicList[rem.dislist].item.length; i++) {
+            let tmpMusic = musicList[rem.dislist].item[i];
             addItem(i + 1, tmpMusic.name, tmpMusic.artist, tmpMusic.album);
         }
 
@@ -439,10 +449,6 @@ function deleteFromList(music){
     }
     // 保存对应的列表
     if(rem.dislist === 1){
-        // 删除的是正在播放的歌曲,则播放下一首歌曲
-        if(rem.playid == music.id){
-            nextMusic();
-        }
         playerSaveData('playing', musicList[rem.dislist].item);  // 保存正在播放列表
     }else if(rem.dislist === 2){
         playerSaveData('his', musicList[rem.dislist].item);  // 保存播放历史列表
@@ -560,7 +566,7 @@ function changeCover(music) {
 function loadList(list) {
     if(musicList[list].isloading === true) {
         layer.msg('列表读取中...', {icon: 16,shade: 0.01,time: 500});
-        return true;
+        // return true;
     }
     
     rem.dislist = list;     // 记录当前显示的列表
@@ -704,8 +710,8 @@ function updateMusicInfo(music) {
     if(!music.id) return false;
     
     // 循环查找播放列表并更新信息
-    for(var i = 0; i < musicList.length; i++) {
-        for(var j = 0; j < musicList[i].item.length; j++) {
+    for(let i = 0; i < musicList.length; i++) {
+        for(let j = 0; j < musicList[i].item.length; j++) {
             // ID 对上了，那就更新信息
             if(musicList[i].item[j].id === music.id && musicList[i].item[j].source === music.source) {
                 musicList[i].item[j] = music;  // 更新音乐信息
@@ -810,8 +816,10 @@ function dataBox(choose) {
 function addHis(music) {
     if(rem.playlist === 2) return true;  // 在播放"播放记录"列表则不作改变
     
-    if(musicList[2].item.length > 300) musicList[2].item.length = 299; // 限定播放历史最多是300首
-    
+    if(musicList[2].item.length > 300){
+        musicList[2].item.length = 299; // 限定播放历史最多是300首
+    }
+
     if(music.id !== undefined && music.id !== '') {
         // 检查历史数据中是否有这首歌，如果有则提至前面
         for(let i = 0; i < musicList[2].item.length; i++) {
@@ -847,13 +855,13 @@ function initList() {
                 musicList[1].item = tmp_item;
             }
         } else if(i === 2) { // 历史记录列表
-            // 读取历史记录,首页显示正在播放列表
+            // 读取历史记录,首页显示历史记录列表
             let tmp_item = playerReadData('his');
             if(tmp_item) {
                 musicList[2].item = tmp_item;
-                Player.defaultlist = 1;   // 默认播放历史列表
+                Player.defaultlist = 2;   // 默认播放历史列表
             }else {
-                Player.defaultlist = 3;  // 没有历史显示自定义列表
+                Player.defaultlist = 1;  // 没有历史显示正在播放
             }
             // ajax读取的系统设置歌单列表
         } else if(musicList[i].item === undefined || (i > 2 && musicList[i].item.length === 0)) {
@@ -861,19 +869,17 @@ function initList() {
             if(!musicList[i].id) {   // 列表ID未定义,则不需要显示
                 continue;
             } else {    // 列表 ID 已定义, 没有名字
-                if(!musicList[i].name) musicList[i].name = '未命名';
                 // id存在,后台ajax加载歌单的内容,但是并未显示
-                ajaxPlayListById(musicList[i].id, musicList[i].sourceId, i, loadList)
+                ajaxPlayListById(musicList[i].id, musicList[i].sourceId, i);
+                if(!musicList[i].name) {
+                    musicList[i].name = '未命名';
+                }
             }
         }
         // 在前端显示出来
         addSheet(i, musicList[i].name, musicList[i].cover);
     }
 
-    // 超出范围,显示播放历史列表
-    if(Player.defaultlist >= musicList.length){
-        Player.defaultlist = 2;
-    }
     // 默认列表加载完成后,展示到首页
     if(musicList[Player.defaultlist].isloading !== true){
         loadList(Player.defaultlist);

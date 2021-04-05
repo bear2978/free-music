@@ -57,8 +57,8 @@ public class KuWoMusic {
         List<MusicInfo> list = new ArrayList<>();
         // http://www.kuwo.cn/api/www/bang/bang/musicList?bangId=17&pn=1&rn=30&httpsStatus=1&reqId=d6739aa0-8b7f-11eb-9226-579cef584e97
         String url = "http://www.kuwo.cn/api/www/bang/bang/musicList?bangId="+ listId +"&pn=1&rn=30&httpsStatus=1&reqId="+ UUID.randomUUID();
-        String csrf = getCsrf();
         Map<String,String> header = new HashMap<>();
+        String csrf = getCsrf();
         header.put("Cookie", "kw_token=" + csrf);
         header.put("csrf", csrf);
         String result = RequestUtil.connectToUrl(url, header, null, Connection.Method.GET);
@@ -134,16 +134,20 @@ public class KuWoMusic {
     /**
      * 获取进入首页Cookie中的csrf
      * @return
-     * @throws IOException
      */
-    private static String getCsrf() throws IOException {
+    private static String getCsrf(){
         String url = "http://www.kuwo.cn/";
-        HttpURLConnection con = (HttpURLConnection)new URL(url).openConnection();
-        // 获得响应头
-        String sessionValue = con.getHeaderField("Set-Cookie");
-        String[] sessionId = sessionValue.split(";");
-        // 从响应头中得到token值
-        return sessionId[0].substring(sessionId[0].indexOf("=") + 1);
+        try {
+            HttpURLConnection con  = (HttpURLConnection)new URL(url).openConnection();
+            // 获得响应头
+            String sessionValue = con.getHeaderField("Set-Cookie");
+            String[] sessionId = sessionValue.split(";");
+            // 从响应头中得到token值
+            return sessionId[0].substring(sessionId[0].indexOf("=") + 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "qazwsxedcr";
+        }
     }
 
     /**
@@ -192,8 +196,8 @@ public class KuWoMusic {
     public static void main(String[] args) {
         try {
             // searchMusic(1,"清空");
-            searchMusic("1","30","白月光与朱砂痣");
-            // getPlayListById("17");
+            // searchMusic("1","30","白月光与朱砂痣");
+            getPlayListById("93");
         } catch (IOException e) {
             e.printStackTrace();
         }

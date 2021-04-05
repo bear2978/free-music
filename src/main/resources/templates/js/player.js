@@ -43,7 +43,6 @@ function audioErr() {
 function pause() {
     if(rem.paused === false) {  // 之前是播放状态
         rem.audio[0].pause();  // 暂停
-
     } else {
         // 第一次点播放
         if(rem.playlist === undefined) {
@@ -150,7 +149,7 @@ function nextMusic() {
             break;
         case 3: // 随机播放
             if (musicList[1] && musicList[1].item.length) {
-                var id = parseInt(Math.random() * musicList[1].item.length);
+                let id = parseInt(Math.random() * musicList[1].item.length);
                 playList(id);
             }
             break;
@@ -198,10 +197,10 @@ function listClick(no) {
         }
         
         // 获取选定歌曲的信息
-        var tmpMusic = musicList[0].item[no];
+        let tmpMusic = musicList[0].item[no];
 
         // 查找当前的播放列表中是否已经存在这首歌
-        for(var i=0; i<musicList[1].item.length; i++) {
+        for(let i = 0; i < musicList[1].item.length; i++) {
             if(musicList[1].item[i].id === tmpMusic.id && musicList[1].item[i].source === tmpMusic.source) {
                 tmpid = i;
                 playList(tmpid);    // 找到了直接播放

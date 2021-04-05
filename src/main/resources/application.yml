@@ -34,6 +34,7 @@ spring:
     host: localhost
     port: 6379
     password:
+    timeout: 5000ms
 
   resources:
     static-locations: classpath:templates/
@@ -45,6 +46,5 @@ spring:
     servlet:
       # 服务器启动时创建servlet
       load-on-startup: 1
-
 
 ##    static-path-pattern: /*

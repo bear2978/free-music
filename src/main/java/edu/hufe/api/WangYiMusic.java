@@ -150,10 +150,10 @@ public class WangYiMusic {
 
     public static void main(String[] args) {
         try {
-            // getPlayListById("3779629");
+            getPlayListById("2884035");
             // getMusicInfoById("1815105886");
             // getLyricById("1815105886");
-            getLyricById("1830718509");
+            // getLyricById("1830718509");
             // searchMusic("饭思思");
         } catch (IOException e) {
             e.printStackTrace();

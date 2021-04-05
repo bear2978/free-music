@@ -8,6 +8,7 @@ import edu.hufe.service.PlayListService;
 import edu.hufe.service.PlayerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
@@ -23,6 +24,12 @@ class FreeMusicApplicationTests {
 
     @Autowired
     private PlayerService playerService;
+
+    @Value("${spring.redis.host}")
+    private String url;
+
+    @Value("${spring.redis.port}")
+    private int port;
 
     @Test
     public void selectAllDataSource(){
@@ -49,8 +56,8 @@ class FreeMusicApplicationTests {
     }
 
     @Test
-    private void test(){
-        System.out.println(2^5);
+    public void test(){
+        System.out.println(url + "---->" + port);
     }
 
 }

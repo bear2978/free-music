@@ -19,6 +19,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     @Override
     // @Cacheable(cacheNames = "dataSource")
     public List<DataSource> findDataSourceList() {
+        // 先去缓存查找数据,没有数据则去数据库查询
         return dataSourceMapper.findAllDataSource();
     }
 }

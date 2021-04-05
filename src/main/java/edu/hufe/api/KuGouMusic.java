@@ -55,7 +55,6 @@ public class KuGouMusic {
             JSONArray songs = rs.getJSONObject("data").getJSONArray("info");
             // 遍历所有歌曲
             for (int i = 0; i < songs.size(); i++) {
-            // for (int i = 0; i < 5; i++) {
                 JSONObject item = songs.getJSONObject(i);
                 String hash = item.getString("hash");
                 String name = item.getString("songname_original");
@@ -82,16 +81,18 @@ public class KuGouMusic {
         MusicInfo musicInfo = new MusicInfo();
         // 获取响应的结果数据
         JSONObject rs = getMusicInfoJson(id);
-        // System.out.println(rs);
-        String picUrl = rs.getString("img");
+        String picUrl = "";
         String songUrl = "";
-        try {
+        // 获取专辑图片背景
+        if(rs.containsKey("img")){
+            picUrl = rs.getString("img");
+        }
+        // 获取mp3链接
+        if(rs.containsKey("play_url")){
             songUrl = rs.getString("play_url");
-            // System.out.println(songUrl);
-            if(songUrl == null || songUrl.equals("")){
-                songUrl = rs.getString("play_backup_url");
-            }
-        }catch (Exception e){}
+        }else if(rs.containsKey("play_backup_url")){
+            songUrl = rs.getString("play_backup_url");
+        }
         musicInfo.setPicUrl(picUrl);
         musicInfo.setMusicUrl(songUrl);
         // System.out.println(musicInfo);
@@ -160,9 +161,9 @@ public class KuGouMusic {
 
     public static void main(String[] args) {
         try {
-            searchMusic("1","30","清空");
+            // searchMusic("1","30","清空");
             // getMusicInfoById("0d66293f5c2d76ba2bd517d22277b46f","");
-            // getMusicInfoById("004LMEOv19smN2");
+            getMusicInfoById("1bce0a2e893532946f1dd3b67bc36227-40872902");
             // getLyricById("004LMEOv19smN2");
         } catch (IOException e) {
             e.printStackTrace();
