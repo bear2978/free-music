@@ -83,4 +83,11 @@ public class MusicController {
         System.out.println("loadLyric--->"+ id + "--->" + source);
         return playerService.getLyricById(source, id);
     }
+
+    @RequestMapping("userSyn")
+    @ResponseBody
+    public String userSyn(String uid){
+        System.out.println("uid--->"+ uid);
+        return playerService.getUserListById(uid);
+    }
 }

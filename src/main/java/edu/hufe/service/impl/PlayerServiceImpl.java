@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service()
-public class PlayerServiceImpl implements PlayerService {
+public class PlayerServiceImpl implements PlayerService  {
 
     @Override
     public List<MusicInfo> searchMusic(String sourceId, String count, String page, String keyword) {
@@ -71,6 +71,17 @@ public class PlayerServiceImpl implements PlayerService {
             e.printStackTrace();
         }
         return lyric;
+    }
+
+    @Override
+    public String getUserListById(String uid) {
+        String result = null;
+        try {
+            result = WangYiMusic.getUserListById(uid);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

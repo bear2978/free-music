@@ -12,4 +12,6 @@ public interface PlayerService {
 
     String getLyricById(String sourceId, String id);
 
+    String getUserListById(String uid);
+
 }

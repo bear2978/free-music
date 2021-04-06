@@ -118,6 +118,19 @@ public class WangYiMusic {
     }
 
     /**
+     * 同步用户歌单
+     * @param uid
+     * @return
+     * @throws IOException
+     */
+    public static String getUserListById(String uid) throws IOException {
+        String url = "http://music.163.com/api/user/playlist/?offset=0&limit=1001&uid=" + uid;
+        String result = RequestUtil.connectToUrl(url,null,null, Connection.Method.GET);
+        // System.out.println(result);
+        return result;
+    }
+
+    /**
      * 将响应的json数据解析成对象返回
      * @param jo
      */
@@ -150,7 +163,8 @@ public class WangYiMusic {
 
     public static void main(String[] args) {
         try {
-            getPlayListById("2884035");
+            getUserListById("3911433357");
+            // getPlayListById("2884035");
             // getMusicInfoById("1815105886");
             // getLyricById("1815105886");
             // getLyricById("1830718509");

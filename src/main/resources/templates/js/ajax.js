@@ -20,7 +20,9 @@ function ajaxSearch() {
         data: "count=" + Player.loadCount + "&source=" + rem.sourceId + "&page=" + rem.loadPage + "&keyword=" + rem.wd,
         dataType: "json",
         complete: function(XMLHttpRequest, textStatus) {
-            if(tmpLoading) layer.close(tmpLoading);    // 关闭加载中动画
+            if(tmpLoading){
+                layer.close(tmpLoading);    // 关闭加载中动画
+            }
         },
         success: function(jsonData){
             // 调试信息输出
@@ -48,8 +50,7 @@ function ajaxSearch() {
             
             var tempItem = [], no = musicList[0].item.length;
             
-            for (var i = 0; i < jsonData.length; i++) {
-                // console.log(jsonData[i]);
+            for (let i = 0; i < jsonData.length; i++) {
                 no ++;
                 tempItem =  {
                     id: jsonData[i].id,            // 音乐ID
@@ -391,40 +392,42 @@ function ajaxUserList(uid) {
     var tmpLoading = layer.msg('加载中...', {icon: 16,shade: 0.01});
     $.ajax({
         type: Player.method,
-        url: "",
-        data: "types=userlist&uid=" + uid,
-        dataType : "jsonp",
+        url: "userSyn",
+        data: "&uid=" + uid,
+        dataType : "json",
         complete: function(XMLHttpRequest, textStatus) {
-            if(tmpLoading) layer.close(tmpLoading);    // 关闭加载中动画
+            if(tmpLoading){
+                layer.close(tmpLoading);    // 关闭加载中动画
+            }
         },  // complete
-        success: function(jsonData){
-            if(jsonData.code == "-1" || jsonData.code == 400){
+        success: function(data){
+            if(data.code == "-1" || data.code == 400){
                 layer.msg('用户 uid 输入有误');
                 return false;
             }
             
-            if(jsonData.playlist.length === 0 || typeof(jsonData.playlist.length) === "undefined") {
+            if(data.playlist.length === 0 || typeof(data.playlist.length) === "undefined") {
                 layer.msg('没找到用户 ' + uid + ' 的歌单');
                 return false;
             }else{
-                var tempList,userList = [];
+                let tempList,userList = [];
                 $("#sheet-bar").remove();   // 移除登陆条
                 rem.uid = uid;  // 记录已同步用户 uid
-                rem.uname = jsonData.playlist[0].creator.nickname;  // 第一个列表(喜欢列表)的创建者即用户昵称
-                layer.msg('欢迎您 '+rem.uname);
+                rem.uname = data.playlist[0].creator.nickname;  // 第一个列表(喜欢列表)的创建者即用户昵称
+                layer.msg('欢迎您 ' + rem.uname);
                 // 记录登录用户
                 playerSaveData('uid', rem.uid);
                 playerSaveData('uname', rem.uname);
                 
-                for (var i = 0; i < jsonData.playlist.length; i++) {
+                for (let i = 0; i < data.playlist.length; i++) {
                     // 获取歌单信息
                     tempList = {
-                        id: jsonData.playlist[i].id,    // 列表的网易云 id
-                        name: jsonData.playlist[i].name,   // 列表名字
-                        cover: jsonData.playlist[i].coverImgUrl  + "?param=200y200",   // 列表封面
+                        id: data.playlist[i].id,    // 列表的网易云 id
+                        name: data.playlist[i].name,   // 列表名字
+                        cover: data.playlist[i].coverImgUrl  + "?param=200y200",   // 列表封面
                         creatorID: uid,   // 列表创建者id
-                        creatorName: jsonData.playlist[i].creator.nickname,   // 列表创建者名字
-                        creatorAvatar: jsonData.playlist[i].creator.avatarUrl,   // 列表创建者头像
+                        creatorName: data.playlist[i].creator.nickname,   // 列表创建者名字
+                        creatorAvatar: data.playlist[i].creator.avatarUrl,   // 列表创建者头像
                         item: []
                     };
                     // 存储并显示播放列表

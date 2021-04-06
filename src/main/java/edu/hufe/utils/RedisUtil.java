@@ -2,61 +2,104 @@ package edu.hufe.utils;
 
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * @author 86185
+ * @time 2021.04.06
  * redisTemplate封装
  */
-//@Component
+@Component
 public class RedisUtil {
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-    @Autowired
-    private ValueOperations<String,String> valueOperations;
-    /** 默认过期时长（一天），单位：秒 */
-    public final static long DEFAULT_EXPIRE = Const.REDIS_DEFAULT_EXPIRE;
-    /** 不设置过期时长 */
-    public final static long NOT_EXPIRE = -1;
+    /**
+     * 是否开启redis缓存  true开启   false关闭
+     */
+    @Value("${spring.redis.open: #{false}}")
+    private boolean open;
 
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
+
+    @Autowired(required = false)
+    private ValueOperations<String,String> valueOperations;
+
+    /**
+     * 存储指定过期时间的值
+     * @param key
+     * @param value
+     * @param expire
+     */
     public void set(String key, Object value, long expire){
         valueOperations.set(key, toJson(value));
-        if(expire != NOT_EXPIRE){
+        if(expire != Const.REDIS_NOT_EXPIRE){
             redisTemplate.expire(key, expire, TimeUnit.SECONDS);
         }
     }
 
+    /**
+     * 存储默认过期时间的值
+     * @param key
+     * @param value
+     */
     public void set(String key, Object value){
-        set(key, value, DEFAULT_EXPIRE);
+        set(key, value, Const.REDIS_DEFAULT_EXPIRE);
+    }
+
+    /**
+     * 获取值
+     * @param key
+     * @param clazz
+     * @param expire
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> getList(String key, Class<T> clazz, long expire) {
+        String value = null;
+        if(open){
+            value = valueOperations.get(key);
+            if(expire != Const.REDIS_NOT_EXPIRE){
+                redisTemplate.expire(key, expire, TimeUnit.SECONDS);
+            }
+        }
+        return value == null ? null : fromJsonArray(value, clazz);
     }
 
     public <T> T get(String key, Class<T> clazz, long expire) {
-        String value = valueOperations.get(key);
-        if(expire != NOT_EXPIRE){
-            redisTemplate.expire(key, expire, TimeUnit.SECONDS);
-        }
-        return value == null ? null : fromJson(value, clazz);
+        List<T> value = getList(key,clazz,expire);
+        return value.size() == 0 ? null : value.get(0);
     }
 
     public <T> T get(String key, Class<T> clazz) {
-        return get(key, clazz, NOT_EXPIRE);
+        return get(key, clazz, Const.REDIS_NOT_EXPIRE);
+    }
+
+    public <T> List<T> getList(String key, Class<T> clazz) {
+        return getList(key, clazz, Const.REDIS_NOT_EXPIRE);
     }
 
     public String get(String key, long expire) {
         String value = valueOperations.get(key);
-        if(expire != NOT_EXPIRE){
+        if(expire != Const.REDIS_NOT_EXPIRE){
             redisTemplate.expire(key, expire, TimeUnit.SECONDS);
         }
         return value;
     }
 
     public String get(String key) {
-        return get(key, NOT_EXPIRE);
+        return get(key, Const.REDIS_NOT_EXPIRE);
     }
 
+    /**
+     * 根据key删除缓存
+     * @param key
+     */
     public void delete(String key) {
         redisTemplate.delete(key);
     }
@@ -77,5 +120,12 @@ public class RedisUtil {
      */
     private <T> T fromJson(String json, Class<T> clazz){
         return JSON.parseObject(json, clazz);
+    }
+
+    /**
+     * JSON数据，转成Object
+     */
+    private  <T> List<T> fromJsonArray(String json, Class<T> clazz){
+        return JSON.parseArray(json, clazz);
     }
 }

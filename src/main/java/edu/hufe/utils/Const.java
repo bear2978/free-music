@@ -7,4 +7,6 @@ public interface Const {
     long REDIS_DEFAULT_EXPIRE = 60 * 60 * 24;
     // redis不设置过期时长
     long REDIS_NOT_EXPIRE = -1;
+    // 时间格式化格式
+    String DATE_FORMAT = "yyyyMMdd";
 }

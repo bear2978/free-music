@@ -1,13 +1,10 @@
 package edu.hufe.entity;
 
-import org.springframework.data.redis.core.RedisHash;
-
 import java.io.Serializable;
 
 /**
  * 歌单实体
  */
-@RedisHash("playlist")
 public class PlayList implements Serializable {
     // id
     private String id;
