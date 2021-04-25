@@ -21,8 +21,8 @@ public class RedisUtil {
     /**
      * 是否开启redis缓存  true开启   false关闭
      */
-    @Value("${spring.redis.open: #{false}}")
-    private boolean open;
+    @Value("${spring.redis.enable: #{false}}")
+    private boolean enable;
 
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
@@ -62,7 +62,7 @@ public class RedisUtil {
      */
     public <T> List<T> getList(String key, Class<T> clazz, long expire) {
         String value = null;
-        if(open){
+        if(enable){
             value = valueOperations.get(key);
             if(expire != Const.REDIS_NOT_EXPIRE){
                 redisTemplate.expire(key, expire, TimeUnit.SECONDS);
@@ -73,7 +73,7 @@ public class RedisUtil {
 
     public <T> T get(String key, Class<T> clazz, long expire) {
         List<T> value = getList(key,clazz,expire);
-        return value.size() == 0 ? null : value.get(0);
+        return value == null || value.size() == 0 ? null : value.get(0);
     }
 
     public <T> T get(String key, Class<T> clazz) {
@@ -123,7 +123,7 @@ public class RedisUtil {
     }
 
     /**
-     * JSON数据，转成Object
+     * JSON数据，转成List
      */
     private  <T> List<T> fromJsonArray(String json, Class<T> clazz){
         return JSON.parseArray(json, clazz);

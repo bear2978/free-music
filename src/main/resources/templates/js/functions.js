@@ -111,7 +111,7 @@ $(function(){
                 }else if(rem.dislist === 0){ // 搜索结果界面可添加到正在播放
                     html += '<span class="list-icon icon-add" data-function="add" title="添加到正在播放列表"></span>';
                 }
-                html += '<span class="list-icon icon-download" data-function="download" title="点击下载这首歌"></span>' +
+                html += '<span class="list-icon icon-download"  data-function="download" title="点击下载这首歌"></span>' +
                         '<span class="list-icon icon-share" data-function="share" title="点击分享这首歌"></span>' +
                 '</div>';
             target.html(html);
@@ -135,6 +135,7 @@ $(function(){
                 break;
             case "download":   // 下载
                 ajaxUrl(musicList[rem.dislist].item[num], download);
+                // download(musicList[rem.dislist].item[num]);
                 break;
             case "share":   // 分享
                 // ajax 请求数据
@@ -389,12 +390,12 @@ function addToPlaying(music){
         rem.playid = -1;
     }
     // 遍历正在播放列表
-    for(var i = 0; i < musicList[rem.dislist].item.length; i++) {
+    for(let i = 0; i < musicList[rem.dislist].item.length; i++) {
         // 与正在播放的歌曲 id 相同
         if((musicList[rem.dislist].item[i].id !== undefined) &&
             (musicList[rem.dislist].item[i].id == musicList[1].item[rem.playid].id) &&
             (musicList[rem.dislist].item[i].source == musicList[1].item[rem.playid].source)) {
-            musicList[2].item.splice(i, 1); // 先删除相同的
+            musicList[1].item.splice(i, 1); // 先删除相同的
             break;     // 删除后直接跳出循环
         }
     }
@@ -468,11 +469,13 @@ function thisShare(obj) {
 // 下载歌曲
 // 参数：包含歌曲信息的数组
 function download(music) {
-    if(music.musicUrl == 'err' || music.musicUrl == "" || music.musicUrl == null) {
+    // 不存在id或者source
+    if(music.id === undefined || music.id === "" || music.source === undefined || music.source === "") {
         layer.msg('这首歌曲不支持下载');
         return;
     }
-    openDownloadDialog(music.musicUrl, music.name + ' - ' + music.artist);
+    // ajaxDownload(music);
+    openDownloadDialog(music.musicUrl, music.name + ' - ' + music.artist + '.mp3');
 }
 
 /**
@@ -482,21 +485,27 @@ function download(music) {
  * http://www.cnblogs.com/liuxianan/p/js-download.html
  */
 function openDownloadDialog(url, saveName) {
-    if(typeof url == 'object' && url instanceof Blob) {
-        url = URL.createObjectURL(url); // 创建blob地址
-    }
-    var aLink = document.createElement('a');
-    aLink.href = url;
-    aLink.target = "_blank";
-    aLink.download = saveName || ""; // HTML5新增的属性,指定保存文件名，可以不要后缀，注意，file:///模式下不会生效
-    var event;
+    let x = new XMLHttpRequest();
+    x.open("GET", url, true);
+    x.responseType = 'blob';
+    let a = document.createElement('a');
+    x.onload = function () {
+        let blob = x.response;
+        a.download = saveName; // HTML5新增的属性,指定保存文件名，可以不要后缀，注意，file:///模式下不会生效
+        a.href = URL.createObjectURL(blob);
+        $("body").append(a);
+        a.click();
+        $(a).remove();
+    };
+    x.send();
+    let event;
     if(window.MouseEvent){
         event = new MouseEvent('click');
     } else {
         event = document.createEvent('MouseEvents');
         event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
     }
-    aLink.dispatchEvent(event);
+    a.dispatchEvent(event);
 }
 
 // 获取外链的ajax回调函数
@@ -507,7 +516,7 @@ function ajaxShare(music) {
         return;
     }
     
-    var tmpHtml = '<p>' + music.artist + ' - ' + music.name + ' 的外链地址为：</p>' + 
+    let tmpHtml = '<p>' + music.artist + ' - ' + music.name + ' 的外链地址为：</p>' +
     '<input class="share-url" onmouseover="this.focus();this.select()" value="' + music.musicUrl + '">' +
     '<p class="share-tips">* 获取到的音乐外链有效期较短，请按需使用。</p>';
     
@@ -593,8 +602,8 @@ function loadList(list) {
         addListBar("nodata");   // 列表中没有数据
     } else {
         // 逐项添加数据
-        for(var i = 0; i < musicList[list].item.length; i++) {
-            var tmpMusic = musicList[list].item[i];
+        for(let i = 0; i < musicList[list].item.length; i++) {
+            let tmpMusic = musicList[list].item[i];
             addItem(i + 1, tmpMusic.name, tmpMusic.artist, tmpMusic.album);
         }
         
@@ -682,7 +691,7 @@ function addListBar(types) {
 
 // 将时间格式化为 00:00 的格式, 参数：原始时间
 function formatTime(time){    
-	var hour,minute,second;
+	let hour,minute,second;
 	hour = String(parseInt(time/3600,10));
 	if(hour.length == 1) hour='0' + hour;
 	
@@ -729,7 +738,7 @@ function refreshList() {
     $(".list-playing").removeClass("list-playing");        // 移除其它的正在播放
     
     if(rem.paused !== true) {   // 没有暂停
-        for(var i=0; i<musicList[rem.dislist].item.length; i++) {
+        for(let i=0; i<musicList[rem.dislist].item.length; i++) {
             // 与正在播放的歌曲 id 相同
             if((musicList[rem.dislist].item[i].id !== undefined) && 
               (musicList[rem.dislist].item[i].id == musicList[1].item[rem.playid].id) && 
@@ -899,7 +908,7 @@ function clearUserList() {
     if(!rem.uid) return false;
     
     // 查找用户歌单起点
-    for(var i = 1; i<musicList.length; i++) {
+    for(let i = 1; i<musicList.length; i++) {
         if(musicList[i].creatorID !== undefined && musicList[i].creatorID == rem.uid) break;    // 找到了就退出
     }
     

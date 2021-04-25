@@ -61,7 +61,7 @@ function pause() {
 
 // 循环顺序
 function orderChange() {
-    var orderDiv = $(".btn-order");
+    let orderDiv = $(".btn-order");
     orderDiv.removeClass();
     switch(rem.order) {
         case 1:     // 单曲循环 -> 列表循环
@@ -70,14 +70,12 @@ function orderChange() {
             layer.msg("列表循环");
             rem.order = 2;
             break;
-            
         case 3:     // 随机播放 -> 单曲循环
             orderDiv.addClass("player-btn btn-order btn-order-single");
             orderDiv.attr("title", "单曲循环");
             layer.msg("单曲循环");
             rem.order = 1;
             break;
-            
         // case 2:
         default:    // 列表循环(其它) -> 随机播放
             orderDiv.addClass("player-btn btn-order btn-order-random");
@@ -97,8 +95,8 @@ function audioPlay() {
         $("#music-progress.mkpgb-dot").addClass("dot-move");   // 小点闪烁效果
     }
     
-    var music = musicList[rem.playlist].item[rem.playid];   // 获取当前播放的歌曲信息
-    var msg = " 正在播放: " + music.name + " - " + music.artist;  // 改变浏览器标题
+    let music = musicList[rem.playlist].item[rem.playid];   // 获取当前播放的歌曲信息
+    let msg = " 正在播放: " + music.name + " - " + music.artist;  // 改变浏览器标题
     
     // 清除定时器
     if (rem.titflash !== undefined ) {
@@ -119,6 +117,7 @@ function titleFlash(msg) {
     // 设置定时间 300ms滚动
     rem.titflash = setInterval(function(){tit()}, 300);
 }
+
 // 暂停
 function audioPause() {
     rem.paused = true;      // 更新状态（已暂停）
@@ -141,6 +140,15 @@ function prevMusic() {
     playList(rem.playid - 1);
 }
 
+// 自动播放时的下一首歌
+function autoNextMusic() {
+    if(rem.order && rem.order === 1) {
+        playList(rem.playid);
+    } else {
+        nextMusic();
+    }
+}
+
 // 播放下一首歌
 function nextMusic() {
     switch (rem.order ? rem.order : 1) {
@@ -155,15 +163,6 @@ function nextMusic() {
             break;
         default:
             playList(rem.playid + 1);
-    }
-}
-
-// 自动播放时的下一首歌
-function autoNextMusic() {
-    if(rem.order && rem.order === 1) {
-        playList(rem.playid);
-    } else {
-        nextMusic();
     }
 }
 
@@ -329,8 +328,7 @@ function mBcallback(newVal) {
     refreshLyric(newTime);  // 强制滚动歌词到当前进度
 }
 
-// 音量条变动回调函数
-// 参数：新的值
+// 音量条变动回调函数，参数：新的值
 function vBcallback(newVal) {
     if(rem.audio[0] !== undefined) {   // 音频对象已加载则立即改变音量
         rem.audio[0].volume = newVal;
@@ -417,9 +415,7 @@ mkpgb.prototype = {
             mk.goto(percent);
             return true;
         }
-        
         mk.goto(mk.percent);
-        
         return true;
     },
     // 跳转至某处

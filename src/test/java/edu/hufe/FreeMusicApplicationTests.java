@@ -35,7 +35,7 @@ class FreeMusicApplicationTests {
     @Autowired
     private RedisUtil redisUtil;
 
-    @Value("${spring.redis.open: #{false}}")
+    @Value("${spring.redis.enable: #{false}}")
     private boolean open;
 
     @Test

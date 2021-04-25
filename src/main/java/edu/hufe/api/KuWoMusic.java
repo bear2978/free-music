@@ -116,16 +116,19 @@ public class KuWoMusic {
         JSONObject rs = JSONObject.fromObject(result);
         String status = rs.getString("status");
         if("200".equals(status)) {
-            // 获取歌词的json
-            JSONArray lrcList = rs.getJSONObject("data").getJSONArray("lrclist");
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < lrcList.size(); i++){
-                JSONObject item = lrcList.getJSONObject(i);
-                String content = item.getString("lineLyric");
-                String time = item.getString("time");
-                sb.append("["+ formatTime(time) +"] " + content + "\n");
+            JSONObject data = rs.getJSONObject("data");
+            if(data.containsKey("lrclist") && !"null".equals(data.getString("lrclist"))){
+                // 获取歌词的json
+                JSONArray lrcList = data.getJSONArray("lrclist");
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < lrcList.size(); i++){
+                    JSONObject item = lrcList.getJSONObject(i);
+                    String content = item.getString("lineLyric");
+                    String time = item.getString("time");
+                    sb.append("["+ formatTime(time) +"] " + content + "\n");
+                }
+                lyric.put("lyric", sb.toString());
             }
-            lyric.put("lyric", sb.toString());
         }
         // System.out.println(lyric.toString());
         return lyric.toString();
@@ -197,7 +200,8 @@ public class KuWoMusic {
         try {
             // searchMusic(1,"清空");
             // searchMusic("1","30","白月光与朱砂痣");
-            getPlayListById("93");
+            // getPlayListById("93");
+            getLyricById("173029318");
         } catch (IOException e) {
             e.printStackTrace();
         }

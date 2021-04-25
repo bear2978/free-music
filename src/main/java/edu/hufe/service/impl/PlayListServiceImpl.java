@@ -44,7 +44,7 @@ public class PlayListServiceImpl implements PlayListService {
     @Override
     public List<MusicInfo> queryDetailList(String sourceId, String id) {
         /**
-         * 如何存储每日榜单？   歌单id + 日期
+         * 如何存储每日榜单   歌单id + 日期
          */
         // 获取当前日期
         String date = new SimpleDateFormat(Const.DATE_FORMAT).format(System.currentTimeMillis());

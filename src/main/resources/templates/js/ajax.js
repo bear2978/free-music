@@ -386,6 +386,38 @@ function ajaxLyric(music, callback) {
     });//ajax
 }
 
+// ajax下载音乐, 参数：音乐ID
+function ajaxDownload(music) {
+    // 发送异步请求
+    $.ajax({
+        type: Player.method,
+        url: "downLoadMusic",
+        data: music,
+        // cache:false,
+        // async:false,
+        responseType: 'blob',
+        success: function(response){
+            // 调试信息输出
+            if (Player.debug) {
+                console.debug("歌曲" + music.name + "链接获取成功");
+            }
+            console.log(response.data);
+            let blob = new Blob([response.data]);
+            let aTag = document.createElement('a');
+            // let headerName = this.getResponseHeader("Content-disposition");
+            // let fileName = decodeURIComponent(headerName);
+            aTag.download = "test.mp3";
+            aTag.href = URL.createObjectURL(blob);
+            aTag.click();
+            URL.revokeObjectURL(blob);
+        },   //success
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            layer.msg('歌曲下载失败 - ' + XMLHttpRequest.status);
+            console.error(XMLHttpRequest + textStatus + errorThrown);
+        }   // error
+    });//ajax
+}
+
 // ajax加载用户的播放列表
 // 参数 用户的网易云 id
 function ajaxUserList(uid) {

@@ -2,12 +2,11 @@ package edu.hufe.utils;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
-
 import java.io.IOException;
 
 /**
  * BASE64
- * @author ysl
+ * @author zyj
  */
 
 public class Base64Decoder {
